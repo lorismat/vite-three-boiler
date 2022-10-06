@@ -28,7 +28,7 @@ export default {
       renderer.setSize(window.innerWidth, window.innerHeight);
 
       // cube
-      const colorCube = new THREE.Color("red")
+      const colorCube = new THREE.Color("blue")
       const geometryCube = new THREE.BoxGeometry(1,1,1);
       const materialCube = new THREE.MeshBasicMaterial( {color: colorCube} );
       cube = new THREE.Mesh(geometryCube, materialCube);
