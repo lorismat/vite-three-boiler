@@ -10,6 +10,7 @@ import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 let stats;
 let scene, renderer, camera, cube;
+let materialCube;
 
 export default {
   methods: {
@@ -29,12 +30,32 @@ export default {
       renderer.setSize(window.innerWidth, window.innerHeight);
 
       // cube
-      const colorCube = new THREE.Color("red")
       const geometryCube = new THREE.BoxGeometry(1,1,1);
-      const materialCube = new THREE.MeshBasicMaterial({
-        color: colorCube,
-        wireframe: false
-      });
+
+      const vertexShader = /* glsl */`
+        varying vec2 vUv;
+        void main () {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `;
+
+      const fragmentShader = /* glsl */`
+        varying vec2 vUv;
+        uniform float time;
+        void main () {
+          gl_FragColor = vec4(vec3(vUv.x, abs(sin(time)), 1.0), 1.0);
+        }
+      `;
+
+      materialCube = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms: {
+          time: { value: 0 },
+        }
+      })
+
       cube = new THREE.Mesh(geometryCube, materialCube);
       scene.add(cube);
 
@@ -79,7 +100,9 @@ export default {
 
     animate() {
       requestAnimationFrame(this.animate);
+
       const time = - performance.now() * 0.0005;
+      materialCube.uniforms.time.value = time;
       
       cube.rotation.x = time;
       cube.rotation.y = time;
