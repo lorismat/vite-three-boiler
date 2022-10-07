@@ -1,18 +1,21 @@
 <template>
   <div>
     <!--<Canvas />-->
-    <CanvasShader />
+    <!--<CanvasShader />-->
+    <CanvasShaderNoise />
   </div>
 </template>
 
 <script>
 import Canvas from './components/Canvas.vue';
-import CanvasShader from './components/CanvasShader.vue'
+import CanvasShader from './components/CanvasShader.vue';
+import CanvasShaderNoise from './components/CanvasShaderNoise.vue';
 
 export default {
   components: {
     Canvas,
-    CanvasShader
+    CanvasShader,
+    CanvasShaderNoise
   }
 }
 </script>
