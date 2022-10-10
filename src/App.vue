@@ -2,7 +2,8 @@
   <div>
     <!--<Canvas />-->
     <!--<CanvasShader />-->
-    <CanvasShaderNoise />
+    <!--<CanvasShaderNoise />-->
+    <CanvasShaderNoiseAndPerlin />
   </div>
 </template>
 
@@ -10,12 +11,14 @@
 import Canvas from './components/Canvas.vue';
 import CanvasShader from './components/CanvasShader.vue';
 import CanvasShaderNoise from './components/CanvasShaderNoise.vue';
+import CanvasShaderNoiseAndPerlin from './components/CanvasShaderNoiseAndPerlin.vue';
 
 export default {
   components: {
     Canvas,
     CanvasShader,
-    CanvasShaderNoise
+    CanvasShaderNoise,
+    CanvasShaderNoiseAndPerlin
   }
 }
 </script>
