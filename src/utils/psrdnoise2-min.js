@@ -2,7 +2,7 @@
 // ver. 2021-12-02, published under the MIT license:
 // https://github.com/stegu/psrdnoise/
 
-export const psrdnoise2 = `
+export const psrdnoise2GLSL = `
 
 float psrdnoise(vec2 x, vec2 period, float alpha, out vec2 gradient)
 {

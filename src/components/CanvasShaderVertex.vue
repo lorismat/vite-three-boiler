@@ -24,8 +24,8 @@ import { simpleNoiseGLSL } from '../utils/simplenoise.js';
 const noise2D = makeNoise2D();
 
 let stats;
-let scene, renderer, camera, cube;
-let materialCube;
+let scene, renderer, camera, plane;
+let materialPlane;
 
 export default {
   methods: {
@@ -44,58 +44,88 @@ export default {
       renderer.setPixelRatio( window.devicePixelRatio );
       renderer.setSize(window.innerWidth, window.innerHeight);
 
-      // cube
-      const geometryCube = new THREE.BoxGeometry(1,1,1);
+      const geometryPlane = new THREE.PlaneGeometry(10,10,30,30);
+
+      // play with vertex shaders
+      // https://codingxr.com/articles/shaders-in-threejs/ 
+      // https://github.com/markhorgan/three-js-shaders/blob/main/src/shader.vert
+      // https://www.youtube.com/watch?v=VwSRizyr1pI
+      
 
       const vertexShader = `
+
         varying vec2 vUv;
+        uniform float time;
+        attribute float aRandom;
+        
         void main () {
           vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          vec3 newPosition = position;
+
+          newPosition.x += abs(sin(time * aRandom));
+          newPosition.y += abs(cos(time * aRandom));
+
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
         }
       `;
 
       const fragmentShader = `
 
+        #define TWO_PI 6.28318530718
+
         varying vec2 vUv;
         uniform float time;
 
-        ${simpleNoiseGLSL}
-        ${psrdnoise2GLSL}
-
-        float noise2D (in vec2 st) {
-          vec2 i = floor(st);
-          vec2 f = fract(st);
-          float a = random(i);
-          float b = random(i + vec2(1.0, 0.0));
-          float c = random(i + vec2(0.0, 1.0));
-          float d = random(i + vec2(1.0, 1.0));
-          vec2 u = f*f*(3.0-2.0*f);
-          return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+        // color transform
+        vec3 hsb2rgb( in vec3 c ){
+          vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),
+                            6.0)-3.0)-1.0,
+                            0.0,
+                            1.0 );
+          rgb = rgb*rgb*(3.0-2.0*rgb);
+          return c.z * mix( vec3(1.0), rgb, c.y);
         }
 
-        void main () {
+        void main () {          
+          vec2 st = vUv;
 
-          float rand = random(vUv);
+          // Use polar coordinates instead of cartesian
+          vec2 toCenter = vec2(0.5)-st;
+          float angle = atan(toCenter.y,toCenter.x);
+          float radius = length(toCenter)*2.0;
 
-          float n = noise2D(vec2(vUv.x*3.0*abs(sin(time)),vUv.y*3.0));
-          gl_FragColor = vec4(vec3(rand, n, n), 1.0);
-          
-          // float n = noise2D(vUv*3.0);
-          // gl_FragColor = vec4(vec3(rand, n, n), 1.0);
+          vec3 color = hsb2rgb(vec3((angle/TWO_PI)+0.5,radius,1.0));
+
+          gl_FragColor = vec4(color, 1.0);
+        
         }
       `;
 
-      materialCube = new THREE.ShaderMaterial({
+      
+      materialPlane= new THREE.ShaderMaterial({
         vertexShader,
         fragmentShader,
         uniforms: {
           time: { value: 0 },
-        }
-      })
+          uDisplacementScale: { value: 0.3 },
+        },
+        side: THREE.DoubleSide,
+      });
 
-      cube = new THREE.Mesh(geometryCube, materialCube);
-      scene.add(cube);
+      // store the number of vertices
+      const countVertices = geometryPlane.attributes.position.count;
+      const randoms = new Float32Array(countVertices);
+      for (let i = 0; i<countVertices; i++) {
+        randoms[i] = Math.random() * 2 - 1;
+      }
+
+      geometryPlane.setAttribute("aRandom", new THREE.BufferAttribute(randoms, 1));
+      console.log(geometryPlane);
+
+      plane = new THREE.Mesh(geometryPlane, materialPlane);
+
+      
+      scene.add(plane);
 
       // camera init position
       camera.position.set(0,0,20);
@@ -113,23 +143,14 @@ export default {
       const gui = new GUI();
 
       const effectController = {
-        cubeSizeX: 1,
-        cubeSizeY: 1,
-        cubeSizeZ: 1,
-        wireframe: false
+        size: 1
       };
 
       const matChanger = function () {
-        cube.scale.x = effectController.cubeSizeX;
-        cube.scale.y = effectController.cubeSizeY;
-        cube.scale.z = effectController.cubeSizeZ;
-        cube.material.wireframe = effectController.wireframe;
+        plane.scale.setScalar(effectController.size);
       };
 
-      gui.add( effectController, "cubeSizeX", 0, 5, 0.1 ).onChange( matChanger );
-      gui.add( effectController, "cubeSizeY", 0, 5, 0.1 ).onChange( matChanger );
-      gui.add( effectController, "cubeSizeZ", 0, 5, 0.1 ).onChange( matChanger );
-      gui.add( effectController, "wireframe").onChange( matChanger );
+      gui.add( effectController, "size", 0.2, 10, 0.1 ).onChange( matChanger );
 
       gui.close();
       matChanger();
@@ -140,17 +161,7 @@ export default {
       requestAnimationFrame(this.animate);
 
       const time = - performance.now() * 0.0005;
-      materialCube.uniforms.time.value = time;
-
-      const f = 2;
-      const a = 5;
-      
-      cube.rotation.x = time;
-      cube.rotation.y = time;
-
-      cube.position.x = Math.sin(time*f) * a;
-      cube.position.z = Math.cos(time*f) * a;
-      cube.position.y = noise2D(time*0.9,time*1.3);
+      materialPlane.uniforms.time.value = time;
 
       renderer.render(scene, camera);
       stats.update();

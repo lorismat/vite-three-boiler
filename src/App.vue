@@ -3,7 +3,8 @@
     <!--<Canvas />-->
     <!--<CanvasShader />-->
     <!--<CanvasShaderNoise />-->
-    <CanvasShaderNoiseAndPerlin />
+    <!--<CanvasShaderNoiseAndPerlin />-->
+    <CanvasShaderVertex />
   </div>
 </template>
 
@@ -12,13 +13,16 @@ import Canvas from './components/Canvas.vue';
 import CanvasShader from './components/CanvasShader.vue';
 import CanvasShaderNoise from './components/CanvasShaderNoise.vue';
 import CanvasShaderNoiseAndPerlin from './components/CanvasShaderNoiseAndPerlin.vue';
+import CanvasShaderVertex from './components/CanvasShaderVertex.vue';
+
 
 export default {
   components: {
     Canvas,
     CanvasShader,
     CanvasShaderNoise,
-    CanvasShaderNoiseAndPerlin
+    CanvasShaderNoiseAndPerlin,
+    CanvasShaderVertex
   }
 }
 </script>
