@@ -32,7 +32,7 @@ export default {
       // cube
       const geometryCube = new THREE.BoxGeometry(1,1,1);
 
-      const vertexShader = /* glsl */`
+      const vertexShader = `
         varying vec2 vUv;
         void main () {
           vUv = uv;
@@ -41,7 +41,7 @@ export default {
       `;
 
 
-      const fragmentShader = /* glsl */`
+      const fragmentShader = `
         varying vec2 vUv;
         uniform float time;
         void main () {

@@ -5,7 +5,8 @@
     <!--<CanvasShaderNoise />-->
     <!--<CanvasShaderNoiseAndPerlin />-->
     <!--<CanvasShaderVertex />-->
-    <CanvasLightAndShadows />
+    <!--<CanvasLightAndShadows />-->
+    <CanvasSpriteAndShaders />
   </div>
 </template>
 
@@ -16,8 +17,7 @@ import CanvasShaderNoise from './components/CanvasShaderNoise.vue';
 import CanvasShaderNoiseAndPerlin from './components/CanvasShaderNoiseAndPerlin.vue';
 import CanvasShaderVertex from './components/CanvasShaderVertex.vue';
 import CanvasLightAndShadows from './components/CanvasLightAndShadows.vue';
-
-
+import CanvasSpriteAndShaders from './components/CanvasSpriteAndShaders.vue';
 
 export default {
   components: {
@@ -26,7 +26,8 @@ export default {
     CanvasShaderNoise,
     CanvasShaderNoiseAndPerlin,
     CanvasShaderVertex,
-    CanvasLightAndShadows
+    CanvasLightAndShadows,
+    CanvasSpriteAndShaders
   }
 }
 </script>
