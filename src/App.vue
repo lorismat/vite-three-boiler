@@ -11,8 +11,9 @@
     <CanvasLoadObject />
     <CanvasLoadObjectDRC />
     <CanvasVertexShaderLightAnimated />
-    -->
     <CanvasVertexShaderBlender />
+    -->
+    <CleanCode />
   </div>
 </template>
 
@@ -28,6 +29,7 @@ import CanvasLightAndShadows from './components/CanvasLightAndShadows.vue';
 import CanvasSpriteAndShaders from './components/CanvasSpriteAndShaders.vue';
 import CanvasLoadObject from './components/CanvasLoadObject.vue';
 import CanvasLoadObjectDRC from './components/CanvasLoadObjectDRC.vue';
+import CleanCode from './components/CleanCode.vue';
 
 import CanvasVertexShaderLightAnimated from './components/CanvasVertexShaderLightAnimated.vue';
 
@@ -44,7 +46,8 @@ export default {
     CanvasSpriteAndShaders,
     CanvasLoadObject,
     CanvasLoadObjectDRC,
-    CanvasVertexShaderLightAnimated
+    CanvasVertexShaderLightAnimated,
+    CleanCode
   }
 }
 </script>

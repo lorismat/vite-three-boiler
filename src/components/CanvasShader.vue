@@ -40,7 +40,6 @@ export default {
         }
       `;
 
-
       const fragmentShader = `
         varying vec2 vUv;
         uniform float time;

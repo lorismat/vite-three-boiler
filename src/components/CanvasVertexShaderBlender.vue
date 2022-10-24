@@ -36,12 +36,18 @@ export default {
         varying vec3 vNormal;
         uniform float time;
 
+        float random (in float x) {
+          return fract(sin(x)*100000.0);
+        }
+
         void main () {
           vNormal = normal;
 
+          float rand = random(normal.y*normal.x);
+
           vec3 offset = position;
           float dist = 0.5;
-          offset.xyz += normal * dist * abs(sin(time));
+          offset.xyz += normal * dist * abs(sin(time*0.1)) * rand * 7.;
 
           distFromCenter = distance(position.xyz, vec3(0.0));
           gl_Position = projectionMatrix * modelViewMatrix * vec4(offset, 1.0);
@@ -60,7 +66,7 @@ export default {
       const loader = new GLTFLoader();
 
       loader.load(
-        "objects/monkey.glb",
+        "objects/monkey_high.glb",
         function ( gltf ) {
             monkey = gltf.scene.children[0];
 
