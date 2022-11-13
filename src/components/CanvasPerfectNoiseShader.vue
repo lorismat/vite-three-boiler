@@ -7,24 +7,13 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 
-import { SimplexNoise } from 'three/examples/jsm/math/SimplexNoise.js';
-
-
-
-// https://zubazor.medium.com/visualizing-a-mountain-using-three-js-landsat-and-srtm-26275c920e34
-// https://www.youtube.com/watch?v=U9q-jM3-Phc
-// check out fbm (fractional brawnian motion)
-// think of adding a grid helper to have the grid
-// perlin terrain in processing
-// https://www.youtube.com/watch?v=IKB1hWWedMk
+import fragmentShader from '../glsl/snippets/frankfurt/test.frag.js';
+import vertexShader from '../glsl/snippets/frankfurt/test.vert.js';
 
 let stats;
 let scene, renderer, camera;
+let sphere;
 
-const noise = new SimplexNoise();
-
-const gridFactor = 100;
- 
 export default {
   methods: {
 
@@ -41,52 +30,31 @@ export default {
       renderer = new THREE.WebGLRenderer({ antialias : true, canvas});
       renderer.setPixelRatio( window.devicePixelRatio );
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setClearColor( 0xeeeeee, 1 );
 
-      camera.position.set(0,30,200);
+      camera.position.set(0,0,5);
       camera.lookAt( scene.position );
-
       const controls = new OrbitControls( camera, renderer.domElement );
-
       stats = new Stats();
       document.body.appendChild( stats.dom );
 
-      const vertices = [];
-
-      let xOff = 0; let yOff = 0; let zOff = 0;
-      let xInc = 0.05; let yInc = 0.05; let zInc = 0.04;
-      
-      for ( let i = -gridFactor/2; i < gridFactor/2; i ++ ) {
-        for ( let j = -gridFactor/2; j < gridFactor/2; j ++ ) {
-          xOff += xInc;
-          zOff += zInc;
-          const x = i; 
-          const y = noise.noise3d(xOff, yOff, 1) * 10;
-          const z = j;
-          vertices.push( x, y, z );
+      const sphereGeometry = new THREE.SphereGeometry(2, 64, 64);
+      const sphereMaterial = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms: {
+          time: { value: 0}
         }
-        yOff += yInc;
-        xOff = 0;
-      }
-
-
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-
-      const material = new THREE.PointsMaterial( { 
-        color: 0x000000,
-        size: 0.2,
-      } );
-      const points = new THREE.Points( geometry, material );
-
-      scene.add( points );
+      });
+      sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      scene.add(sphere);
 
     },
 
     animate() {
-
       requestAnimationFrame(this.animate);
       const time = - performance.now() * 0.0005;
+
+      sphere.material.uniforms.time.value = time;
 
       renderer.render(scene, camera);
       stats.update();

@@ -67,6 +67,7 @@ export default {
         vertices[ j + 1 ] = data[ i ] * 10;
       }
 
+      /* LOADING WITH TEXTURE
       const loaderTexture = new THREE.TextureLoader();
       const texture = loaderTexture.load( "textures/grid.png" );
 
@@ -79,17 +80,55 @@ export default {
       texture.repeat.set( worldWidth - 1, worldDepth - 1 ); 
 
       const material = new THREE.MeshLambertMaterial({ 
-        map : texture,
-
+        
         // tranparent: true,
         // alphaTest: 0.5
       });
+      */
 
-      mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        wireframe: true
-      }));
+      const vertexShader = `
+        varying vec2 vUv;
+        void main () {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `;
+
+      const fragmentShader = `
+        varying vec2 vUv;
+        uniform float count;
+
+        void main () {
+          vec3 color = vec3(1.);
+          vec2 st = vUv;
+          st = fract(st*count);
+          float t = 0.03;
+          vec2 br = 1. - step(st,vec2(t));
+          vec2 tl = 1. - step(1.-st,vec2(t));
+          gl_FragColor = vec4(vec3(br.x * br.y * tl.x * tl.y),1.);
+
+        }
+      `;
+
+
+      const material = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms: {
+          count: { value: worldWidth  }
+        }
+      });
+
+      mesh = new THREE.Mesh( geometry, material);
 			scene.add( mesh );
+
+
+
+
+
+
+
+
 
       const controls = new OrbitControls( camera, renderer.domElement );
 

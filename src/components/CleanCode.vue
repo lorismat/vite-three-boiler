@@ -14,7 +14,7 @@ import Stats from 'three/examples/jsm/libs/stats.module.js';
 import * as lights from '../modules/lights.js';
 
 import vertexShader from '../glsl/test.vert.js';
-import fragmentShader from '../glsl/test.frag.js';
+import fragmentShader from '../glsl/snippets/noisy.frag.js';
 
 let stats;
 let scene, renderer, camera;

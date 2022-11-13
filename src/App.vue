@@ -1,6 +1,7 @@
 <template>
   <div>
     <!--<Canvas />
+    <CanvasMorphing />
     <CanvasShader />
     <CanvasShaderNoise />
     <CanvasShaderNoiseAndPerlin />
@@ -15,10 +16,15 @@
     <CanvasBufferLight />
     <CanvasTerrainPoints />
     <CanvasTerrainSimplex />
-    
-    -->
     <CanvasTerrainImproved />
+    <CleanCode />
+    <CanvasPerfectNoiseShader />
+    <CanvasMorphing />
+    -->
 
+    
+    <CanvasMemoryClock />
+    
     
     
   </div>
@@ -26,6 +32,8 @@
 
 <script>
 import Canvas from './components/Canvas.vue';
+import CanvasMemoryClock from './components/CanvasMemoryClock.vue';
+import CanvasMorphing from './components/CanvasMorphing.vue';
 import CanvasBufferLight from './components/CanvasBufferLight.vue';
 import CanvasShader from './components/CanvasShader.vue';
 import CanvasShaderNoise from './components/CanvasShaderNoise.vue';
@@ -41,10 +49,18 @@ import CleanCode from './components/CleanCode.vue';
 import CanvasTerrainSimplex from './components/CanvasTerrainSimplex.vue';
 import CanvasTerrainPoints from './components/CanvasTerrainPoints.vue';
 import CanvasTerrainImproved from './components/CanvasTerrainImproved.vue';
+import CanvasPerfectNoiseShader from './components/CanvasPerfectNoiseShader.vue';
+import CanvasMorphingObject from './components/CanvasMorphingObject.vue';
+
+
+
 
 export default {
   components: {
     Canvas,
+    CanvasMemoryClock,
+    CanvasMorphing,
+    CanvasMorphingObject,
     CanvasBufferLight,
     CanvasShader,
     CanvasShaderNoise,
@@ -59,7 +75,8 @@ export default {
     CleanCode,
     CanvasTerrainSimplex,
     CanvasTerrainPoints, 
-    CanvasTerrainImproved
+    CanvasTerrainImproved,
+    CanvasPerfectNoiseShader
   }
 }
 </script>

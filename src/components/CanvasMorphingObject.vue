@@ -4,12 +4,18 @@
 
 <script>
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 let stats;
-let scene, renderer, camera, cube;
+let scene, renderer, camera, clock;
+
+let mesh, points;
+
+let sign = 1;
+let speed = 0.5;
 
 export default {
   methods: {
@@ -27,16 +33,8 @@ export default {
       renderer = new THREE.WebGLRenderer({ antialias : true, canvas});
       renderer.setPixelRatio( window.devicePixelRatio );
       renderer.setSize(window.innerWidth, window.innerHeight);
+      clock = new THREE.Clock();
 
-      // cube
-      const colorCube = new THREE.Color("red")
-      const geometryCube = new THREE.BoxGeometry(1,1,1);
-      const materialCube = new THREE.MeshBasicMaterial({
-        color: colorCube,
-        wireframe: false
-      });
-      cube = new THREE.Mesh(geometryCube, materialCube);
-      scene.add(cube);
 
       // camera init position
       camera.position.set(0,0,5);
@@ -50,40 +48,52 @@ export default {
       stats = new Stats();
       document.body.appendChild( stats.dom );
 
-      // GUI
-      const gui = new GUI();
+      const loader = new GLTFLoader();
+				loader.load( 'objects/AnimatedMorphSphere/AnimatedMorphSphere.gltf', function ( gltf ) {
+					gltf.scene.traverse( function ( node ) {
+						if ( node.isMesh ) mesh = node;
+					} );
+					mesh.material.morphTargets = true;
+					//mesh.rotation.z = Math.PI / 2;
+					//mesh.material.visible = false;
+					scene.add( mesh );
 
-      const effectController = {
-        cubeSizeX: 1,
-        cubeSizeY: 1,
-        cubeSizeZ: 1,
-        wireframe: false
-      };
+					const pointsMaterial = new THREE.PointsMaterial( {
+						size: 10,
+						sizeAttenuation: false,
+						map: new THREE.TextureLoader().load( 'textures/spark1.png' ),
+						alphaTest: 0.5,
+						morphTargets: true
+					} );
+          
+					points = new THREE.Points( mesh.geometry, pointsMaterial );
+          points.scale.setScalar(100);
+					points.morphTargetInfluences = [0,0];
+					//points.morphTargetDictionary = mesh.morphTargetDictionary;
+          //console.log(points.morphTargetDictionary)
+					scene.add( points );
+				} );
 
-      const matChanger = function () {
-        cube.scale.x = effectController.cubeSizeX;
-        cube.scale.y = effectController.cubeSizeY;
-        cube.scale.z = effectController.cubeSizeZ;
-        cube.material.wireframe = effectController.wireframe;
-      };
-
-      gui.add( effectController, "cubeSizeX", 0, 5, 0.1 ).onChange( matChanger );
-      gui.add( effectController, "cubeSizeY", 0, 5, 0.1 ).onChange( matChanger );
-      gui.add( effectController, "cubeSizeZ", 0, 5, 0.1 ).onChange( matChanger );
-      gui.add( effectController, "wireframe").onChange( matChanger );
-
-      gui.close();
-      matChanger();
+      
 
     },
 
     animate() {
       requestAnimationFrame(this.animate);
-      const time = - performance.now() * 0.0005;
-      
-      cube.rotation.x = time;
-      cube.rotation.y = time;
 
+      const delta = clock.getDelta();
+				if ( points !== undefined ) {
+					const step = delta * speed;
+
+
+					points.morphTargetInfluences[ 1 ] = points.morphTargetInfluences[ 1 ] + step * sign;
+					if ( points.morphTargetInfluences[ 1 ] <= 0 || points.morphTargetInfluences[ 1 ] >= 1 ) {
+						sign *= - 1;
+					}
+
+          
+				}
+      
       renderer.render(scene, camera);
       stats.update();
     },
@@ -95,8 +105,10 @@ export default {
     }
 
   },
-  mounted() {
+  created() {
     window.addEventListener("resize", this.onWindowResize);
+  },
+  mounted() {
     this.init();
     this.animate();
   }

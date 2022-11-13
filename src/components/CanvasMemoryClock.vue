@@ -1,5 +1,12 @@
 <template>
-  <canvas id="c1"></canvas>
+<div>
+  <div class="btn-refresh ">
+    <button @click="refresh">refresh</button>
+  </div>
+  <div>
+    <canvas id="c1"></canvas>
+  </div>
+</div>
 </template>
 
 <script>
@@ -15,6 +22,7 @@ export default {
   methods: {
 
     init() {
+
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(
         70,
@@ -28,8 +36,11 @@ export default {
       renderer.setPixelRatio( window.devicePixelRatio );
       renderer.setSize(window.innerWidth, window.innerHeight);
 
+      const colors = ["yellow","purple","red","blue","green","pink","chocolate"];
+      console.log(colors.length)
+      const color = colors[parseInt(Math.random()*colors.length)]
       // cube
-      const colorCube = new THREE.Color("red")
+      const colorCube = new THREE.Color(color);
       const geometryCube = new THREE.BoxGeometry(1,1,1);
       const materialCube = new THREE.MeshBasicMaterial({
         color: colorCube,
@@ -92,6 +103,45 @@ export default {
       camera.aspect = window.innerWidth / window.innerHeight ;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+    },
+
+    refresh() {
+
+      // useful link
+      // https://stackoverflow.com/questions/30359830/how-do-i-clear-three-js-scene
+      // official example
+      // https://threejs.org/examples/#webgl_test_memory
+
+      // get info from renderer
+      // and check if the cleaning is processing
+      console.log(renderer.info, renderer.render);
+
+      // pre-cleaning
+      scene.traverse(function ( object ) {
+        if ( object.geometry ) {
+          object.geometry.dispose();
+        }
+        if ( object.material ) {
+          object.material.dispose();
+        }
+      });
+
+      // final cleaning
+      while(scene.children.length > 0){ 
+        scene.remove(scene.children[0]); 
+      }
+
+      // renderer cleaning
+      renderer.dispose();
+      renderer.context=undefined;
+      renderer.domElement=undefined;
+
+      // never re animate!
+      this.init();
+      
+      // to init the project after loading texture, see 9 summits project
+      
+
     }
 
   },
@@ -102,3 +152,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.btn-refresh {
+  position: absolute;
+  margin:0 auto;
+  z-index: 10;
+  margin-left: 100px;
+}
+
+</style>
