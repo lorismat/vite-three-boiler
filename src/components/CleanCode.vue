@@ -22,7 +22,6 @@ let cube, materialSphere;
 
 export default {
   methods: {
-
     init() {
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(

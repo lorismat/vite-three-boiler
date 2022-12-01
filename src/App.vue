@@ -20,18 +20,17 @@
     <CleanCode />
     <CanvasPerfectNoiseShader />
     <CanvasMorphing />
+    <CanvasMemoryClock />
     -->
 
-    
-    <CanvasMemoryClock />
-    
-    
+    <CanvasRecording />
     
   </div>
 </template>
 
 <script>
 import Canvas from './components/Canvas.vue';
+import CanvasRecording from './components/CanvasRecording.vue';
 import CanvasMemoryClock from './components/CanvasMemoryClock.vue';
 import CanvasMorphing from './components/CanvasMorphing.vue';
 import CanvasBufferLight from './components/CanvasBufferLight.vue';
@@ -58,6 +57,7 @@ import CanvasMorphingObject from './components/CanvasMorphingObject.vue';
 export default {
   components: {
     Canvas,
+    CanvasRecording,
     CanvasMemoryClock,
     CanvasMorphing,
     CanvasMorphingObject,
@@ -77,6 +77,17 @@ export default {
     CanvasTerrainPoints, 
     CanvasTerrainImproved,
     CanvasPerfectNoiseShader
+  },
+  mounted() {
+    /*
+    const pluginCCapture = document.createElement("script");
+    pluginCCapture.setAttribute(
+      "src",
+      "/libs/CCapture.all.min.js"
+    ); 
+    document.head.appendChild(pluginCCapture); 
+    console.log("setting script")
+    */
   }
 }
 </script>

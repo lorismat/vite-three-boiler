@@ -1,5 +1,10 @@
 <template>
-  <canvas id="c1"></canvas>
+  <div>
+    <div class="btn-container">
+      <button @click="startRecording">record gif</button>
+    </div>
+    <canvas id="c1"></canvas>
+  </div>
 </template>
 
 <script>
@@ -11,8 +16,35 @@ import Stats from 'three/examples/jsm/libs/stats.module.js';
 let stats;
 let scene, renderer, camera, cube;
 
+// for gif recording
+let canvas, capturer;
+let frame = 0;
+const stopFrame = 50;
+
 export default {
   methods: {
+    startRecording() {
+      // https://github.com/spite/ccapture.js/
+      // include libraries in the html script via App (injection onMount) OR
+      // directly in the html file, depending on the vue version:   ===    script src="/libs/CCapture.all.min.js" 
+      // two files are required in the libs (public folder)
+      // CCapture.all.min.js and gif.worker.js
+      // add a startRecording method to the button
+      
+      capturer = new CCapture({ 
+        framerate: 30,
+        // name: `gif_${Math.random().toFixed(2)}`,
+        // startTime: 1,
+        // motionBlurFrames: 1,
+        format: 'gif', 
+        workersPath: '/libs/'
+      });
+      capturer.start();
+
+      // this.init();
+      this.trigger = 0;
+      
+    },
     init() {
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(
@@ -22,13 +54,13 @@ export default {
         3000
       );
 
-      let canvas = document.getElementById("c1");
+      canvas = document.getElementById("c1");
       renderer = new THREE.WebGLRenderer({ antialias : true, canvas});
       renderer.setPixelRatio( window.devicePixelRatio );
       renderer.setSize(window.innerWidth, window.innerHeight);
 
       // cube
-      const colorCube = new THREE.Color("red")
+      const colorCube = new THREE.Color("turquoise")
       const geometryCube = new THREE.BoxGeometry(1,1,1);
       const materialCube = new THREE.MeshBasicMaterial({
         color: colorCube,
@@ -49,31 +81,6 @@ export default {
       stats = new Stats();
       document.body.appendChild( stats.dom );
 
-      // GUI
-      const gui = new GUI();
-
-      const effectController = {
-        cubeSizeX: 1,
-        cubeSizeY: 1,
-        cubeSizeZ: 1,
-        wireframe: false
-      };
-
-      const matChanger = function () {
-        cube.scale.x = effectController.cubeSizeX;
-        cube.scale.y = effectController.cubeSizeY;
-        cube.scale.z = effectController.cubeSizeZ;
-        cube.material.wireframe = effectController.wireframe;
-      };
-
-      gui.add( effectController, "cubeSizeX", 0, 5, 0.1 ).onChange( matChanger );
-      gui.add( effectController, "cubeSizeY", 0, 5, 0.1 ).onChange( matChanger );
-      gui.add( effectController, "cubeSizeZ", 0, 5, 0.1 ).onChange( matChanger );
-      gui.add( effectController, "wireframe").onChange( matChanger );
-
-      gui.close();
-      matChanger();
-
     },
 
     animate() {
@@ -85,6 +92,19 @@ export default {
 
       renderer.render(scene, camera);
       stats.update();
+      
+      if (this.trigger < 1 && capturer != undefined) {
+        frame += 1;
+        capturer.capture(canvas);
+        if (frame > stopFrame) {
+          capturer.stop();
+          capturer.save();
+          this.trigger++;
+        }
+      }
+      
+      
+      
     },
 
     onWindowResize() {
@@ -98,6 +118,37 @@ export default {
     window.addEventListener("resize", this.onWindowResize);
     this.init();
     this.animate();
+  },
+  data(){
+    const trigger = 1;
+    return {
+      trigger
+    }
   }
 }
 </script>
+
+<style scoped>
+
+canvas {
+  z-index: -10;
+}
+
+.btn-container {
+  text-align: center;
+  padding: 10px;
+}
+
+button {
+  padding: 8px 16px;
+  font-size: 16px;
+  margin: 0 auto;
+  font-family: monospace;
+  background-color: #fff;
+  color: #333;
+  font-weight: 600;
+  cursor:pointer;
+  outline: none;
+
+}
+</style>
